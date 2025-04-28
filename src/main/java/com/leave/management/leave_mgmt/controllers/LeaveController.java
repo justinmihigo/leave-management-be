@@ -6,6 +6,7 @@ import com.leave.management.leave_mgmt.dto.LeaveRequestDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -80,5 +81,30 @@ public class LeaveController {
     public ResponseEntity<List<Leave>> getAllLeaves() {
         List<Leave> leaves = leaveService.getAllLeaves();
         return ResponseEntity.ok(leaves);
+    }
+
+    @PostMapping("/test-email")
+    public ResponseEntity<String> sendTestEmail(@RequestBody Map<String, String> request) {
+        String toEmail = request.get("email");
+        if (toEmail == null || toEmail.isEmpty()) {
+            return ResponseEntity.badRequest().body("Email address is required");
+        }
+
+        try {
+            // Create a test leave object
+            Leave testLeave = new Leave();
+            testLeave.setUserId("test-user");
+            testLeave.setLeaveType("Test Leave");
+            testLeave.setStartDate(LocalDate.now());
+            testLeave.setEndDate(LocalDate.now());
+            testLeave.setReason("This is a test email notification");
+
+            // Use the existing notification service through leaveService
+            leaveService.applyForLeave(testLeave);
+            
+            return ResponseEntity.ok("Test email sent successfully to " + toEmail);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Failed to send test email: " + e.getMessage());
+        }
     }
 }

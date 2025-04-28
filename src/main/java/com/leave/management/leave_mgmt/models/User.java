@@ -11,6 +11,7 @@ public class User {
     private String name;
     private String email;
     private String role = "Staff"; // Default role
+    private String department; // New department field
     private int leaveBalance = 20; // Default leave days
     private String password;
 
@@ -45,6 +46,14 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
     }
 
     public int getLeaveBalance() {

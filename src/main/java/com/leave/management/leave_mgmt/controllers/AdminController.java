@@ -5,11 +5,15 @@ import com.leave.management.leave_mgmt.models.User;
 import com.leave.management.leave_mgmt.services.LeaveService;
 import com.leave.management.leave_mgmt.services.UserService;
 import com.leave.management.leave_mgmt.services.AdminService;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -52,42 +56,82 @@ public class AdminController {
     }
 
     @GetMapping("/export/users")
-    public ResponseEntity<String> exportUsersToCSV() {
+    public ResponseEntity<InputStreamResource> exportUsersToCSV() {
         try {
             String filePath = adminService.exportUsersToCSV();
-            return ResponseEntity.ok("Users exported to: " + filePath);
+            File file = new File(filePath);
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=users.csv");
+            headers.add(HttpHeaders.CONTENT_TYPE, "text/csv");
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(file.length())
+                    .body(resource);
         } catch (IOException e) {
-            return ResponseEntity.status(500).body("Error exporting users: " + e.getMessage());
+            return ResponseEntity.status(500).body(null);
         }
     }
 
     @GetMapping("/export/leaves")
-    public ResponseEntity<String> exportLeavesToCSV() {
+    public ResponseEntity<InputStreamResource> exportLeavesToCSV() {
         try {
             String filePath = adminService.exportLeavesToCSV();
-            return ResponseEntity.ok("Leaves exported to: " + filePath);
+            File file = new File(filePath);
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=leaves.csv");
+            headers.add(HttpHeaders.CONTENT_TYPE, "text/csv");
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(file.length())
+                    .body(resource);
         } catch (IOException e) {
-            return ResponseEntity.status(500).body("Error exporting leaves: " + e.getMessage());
+            return ResponseEntity.status(500).body(null);
         }
     }
 
     @GetMapping("/export/users/excel")
-    public ResponseEntity<String> exportUsersToExcel() {
+    public ResponseEntity<InputStreamResource> exportUsersToExcel() {
         try {
             String filePath = adminService.exportUsersToExcel();
-            return ResponseEntity.ok("Users exported to: " + filePath);
+            File file = new File(filePath);
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=users.xlsx");
+            headers.add(HttpHeaders.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(file.length())
+                    .body(resource);
         } catch (IOException e) {
-            return ResponseEntity.status(500).body("Error exporting users to Excel: " + e.getMessage());
+            return ResponseEntity.status(500).body(null);
         }
     }
 
     @GetMapping("/export/leaves/excel")
-    public ResponseEntity<String> exportLeavesToExcel() {
+    public ResponseEntity<InputStreamResource> exportLeavesToExcel() {
         try {
             String filePath = adminService.exportLeavesToExcel();
-            return ResponseEntity.ok("Leaves exported to: " + filePath);
+            File file = new File(filePath);
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=leaves.xlsx");
+            headers.add(HttpHeaders.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(file.length())
+                    .body(resource);
         } catch (IOException e) {
-            return ResponseEntity.status(500).body("Error exporting leaves to Excel: " + e.getMessage());
+            return ResponseEntity.status(500).body(null);
         }
     }
 
@@ -108,6 +152,46 @@ public class AdminController {
             return ResponseEntity.ok("Leave type report generated at: " + filePath);
         } catch (IOException e) {
             return ResponseEntity.status(500).body("Error generating leave type report: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/export/users/department/{department}/csv")
+    public ResponseEntity<InputStreamResource> exportUsersByDepartmentToCSV(@PathVariable String department) {
+        try {
+            String filePath = adminService.exportUsersByDepartmentToCSV(department);
+            File file = new File(filePath);
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=users_" + department + ".csv");
+            headers.add(HttpHeaders.CONTENT_TYPE, "text/csv");
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(file.length())
+                    .body(resource);
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    @GetMapping("/export/users/department/{department}/excel")
+    public ResponseEntity<InputStreamResource> exportUsersByDepartmentToExcel(@PathVariable String department) {
+        try {
+            String filePath = adminService.exportUsersByDepartmentToExcel(department);
+            File file = new File(filePath);
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=users_" + department + ".xlsx");
+            headers.add(HttpHeaders.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(file.length())
+                    .body(resource);
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body(null);
         }
     }
 }

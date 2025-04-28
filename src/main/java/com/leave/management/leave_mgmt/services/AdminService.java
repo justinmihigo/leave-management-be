@@ -28,6 +28,10 @@ public class AdminService {
         return userRepository.findAll();
     }
 
+    public List<User> getUsersByDepartment(String department) {
+        return userRepository.findByDepartment(department);
+    }
+
     public List<Leave> getAllLeaves() {
         return leaveRepository.findAll();
     }
@@ -36,12 +40,30 @@ public class AdminService {
         List<User> users = getAllUsers();
         String filePath = "users.csv";
         try (FileWriter writer = new FileWriter(filePath)) {
-            writer.append("ID,Name,Email,Role,Leave Balance\n");
+            writer.append("ID,Name,Email,Role,Department,Leave Balance\n");
             for (User user : users) {
                 writer.append(user.getId()).append(",")
                       .append(user.getName()).append(",")
                       .append(user.getEmail()).append(",")
                       .append(user.getRole()).append(",")
+                      .append(user.getDepartment() != null ? user.getDepartment() : "").append(",")
+                      .append(String.valueOf(user.getLeaveBalance())).append("\n");
+            }
+        }
+        return filePath;
+    }
+
+    public String exportUsersByDepartmentToCSV(String department) throws IOException {
+        List<User> users = getUsersByDepartment(department);
+        String filePath = "users_" + department + ".csv";
+        try (FileWriter writer = new FileWriter(filePath)) {
+            writer.append("ID,Name,Email,Role,Department,Leave Balance\n");
+            for (User user : users) {
+                writer.append(user.getId()).append(",")
+                      .append(user.getName()).append(",")
+                      .append(user.getEmail()).append(",")
+                      .append(user.getRole()).append(",")
+                      .append(user.getDepartment() != null ? user.getDepartment() : "").append(",")
                       .append(String.valueOf(user.getLeaveBalance())).append("\n");
             }
         }
@@ -77,7 +99,8 @@ public class AdminService {
             header.createCell(1).setCellValue("Name");
             header.createCell(2).setCellValue("Email");
             header.createCell(3).setCellValue("Role");
-            header.createCell(4).setCellValue("Leave Balance");
+            header.createCell(4).setCellValue("Department");
+            header.createCell(5).setCellValue("Leave Balance");
 
             int rowIndex = 1;
             for (User user : users) {
@@ -86,7 +109,39 @@ public class AdminService {
                 row.createCell(1).setCellValue(user.getName());
                 row.createCell(2).setCellValue(user.getEmail());
                 row.createCell(3).setCellValue(user.getRole());
-                row.createCell(4).setCellValue(user.getLeaveBalance());
+                row.createCell(4).setCellValue(user.getDepartment() != null ? user.getDepartment() : "");
+                row.createCell(5).setCellValue(user.getLeaveBalance());
+            }
+
+            try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
+                workbook.write(fileOut);
+            }
+        }
+        return filePath;
+    }
+
+    public String exportUsersByDepartmentToExcel(String department) throws IOException {
+        List<User> users = getUsersByDepartment(department);
+        String filePath = "users_" + department + ".xlsx";
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Users");
+            Row header = sheet.createRow(0);
+            header.createCell(0).setCellValue("ID");
+            header.createCell(1).setCellValue("Name");
+            header.createCell(2).setCellValue("Email");
+            header.createCell(3).setCellValue("Role");
+            header.createCell(4).setCellValue("Department");
+            header.createCell(5).setCellValue("Leave Balance");
+
+            int rowIndex = 1;
+            for (User user : users) {
+                Row row = sheet.createRow(rowIndex++);
+                row.createCell(0).setCellValue(user.getId());
+                row.createCell(1).setCellValue(user.getName());
+                row.createCell(2).setCellValue(user.getEmail());
+                row.createCell(3).setCellValue(user.getRole());
+                row.createCell(4).setCellValue(user.getDepartment() != null ? user.getDepartment() : "");
+                row.createCell(5).setCellValue(user.getLeaveBalance());
             }
 
             try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
