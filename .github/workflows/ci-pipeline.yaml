@@ -26,7 +26,7 @@ jobs:
           cache: maven
 
       - name: Build with Maven
-        run: mvn clean install --batch-mode
+        run: mvn clean verify --batch-mode
 
       - name: Run Tests
         run: mvn test
@@ -38,6 +38,7 @@ jobs:
           args: >
             -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
+            -Dsonar.java.binaries=target
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         #   SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
@@ -46,5 +47,5 @@ jobs:
       - name: Upload JAR Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: my-java-app
+          name: leave_mgt
           path: target/*.jar
