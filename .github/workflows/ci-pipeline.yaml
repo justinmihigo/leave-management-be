@@ -3,13 +3,13 @@ name: CI Pipeline
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - .github/workflows/releases.yaml
   pull_request:
     branches: [ main ]
-  excludes:
-    - 'v*.*.*' 
-    - ./github/workflows/releases.yaml
-
-
+    paths-ignore:
+      - .github/workflows/releases.yaml
+   
 jobs:
   build-and-test:
     name: Build, Test, and Analyze
