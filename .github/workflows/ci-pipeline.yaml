@@ -5,6 +5,10 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  excludes:
+    - 'v*.*.*' 
+    - ./github/workflows/releases.yaml
+
 
 jobs:
   build-and-test:

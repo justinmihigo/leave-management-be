@@ -22,7 +22,7 @@ jobs:
         run: mvn clean install --batch-mode
      
       - name: Build Docker Image
-        run: docker build -t DOCKERHUB_USERNAME/leave_management:${{ github.ref_name }} .
+        run: docker build -t ${{secrets.DOCKERHUB_USERNAME}}/leave_management:${{ github.ref_name }} .
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -31,4 +31,4 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Push Docker Image to Docker Hub
-        run: docker push DOCKERHUB_USERNAME/leave_management:${{ github.ref_name }}
+        run: docker push ${{secrets.DOCKERHUB_USERNAME}}/leave_management:${{ github.ref_name }}
