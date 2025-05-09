@@ -1,14 +1,18 @@
-# Use an official OpenJDK runtime as a parent image
-FROM openjdk:21-jdk-slim
 
-# Set the working directory in the container
-WORKDIR /app
+FROM eclipse-temurin:21-jre-alpine
 
-# Copy the Maven build output JAR file to the container
+RUN addgroup --system spring && adduser --system justin --ingroup spring
+
+WORKDIR /home/justin/app
+
 COPY target/leave_mgmt-0.0.1-SNAPSHOT.jar app.jar
 
-# Expose the port the application runs on
 EXPOSE 8080
 
-# Command to run the application
+RUN chown justin:spring app.jar
+
+RUN chmod 755 app.jar
+
+USER justin
+
 ENTRYPOINT ["java", "-jar", "app.jar"]
